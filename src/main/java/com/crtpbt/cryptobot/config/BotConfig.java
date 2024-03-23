@@ -13,4 +13,20 @@ public class BotConfig {
     String botName;
     @Value("${bot.token}")
     String token;
+
+    public String getBotName() {
+        return botName;
+    }
+
+    public void setBotName(String botName) {
+        this.botName = botName;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 }
