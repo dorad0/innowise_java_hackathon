@@ -13,6 +13,8 @@ public class BotConfig {
     String botName;
     @Value("${bot.token}")
     String token;
+    @Value("${bot.chatId}")
+    String chatId;
 
     public String getBotName() {
         return botName;
@@ -28,5 +30,13 @@ public class BotConfig {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(String chatId) {
+        this.chatId = chatId;
     }
 }
