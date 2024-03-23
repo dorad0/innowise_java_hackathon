@@ -1,6 +1,7 @@
 package com.crtpbt.cryptobot.bot;
 
 import com.crtpbt.cryptobot.config.BotConfig;
+import com.crtpbt.cryptobot.service.CurrencyService;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -13,9 +14,11 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
     final BotConfig config;
+    final CurrencyService service;
 
-    public TelegramBot(BotConfig config) {
+    public TelegramBot(BotConfig config, CurrencyService service) {
         this.config = config;
+        this.service = service;
     }
 
     @Override
@@ -30,14 +33,13 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(@NotNull Update update) {
-        //если получено сообщение текстом
-        long userId = 0; //это нам понадобится позже
+        long userId = 0;
         long chatId = 0;
         String userName = null;
         String receivedMessage;
 
 
-        if(update.hasMessage()) {
+        if (update.hasMessage()) {
             chatId = update.getMessage().getChatId();
             userId = update.getMessage().getFrom().getId();
             userName = update.getMessage().getFrom().getFirstName();
@@ -47,7 +49,6 @@ public class TelegramBot extends TelegramLongPollingBot {
                 botAnswerUtils(receivedMessage, chatId, userName);
             }
 
-            //если нажата одна из кнопок бота
         } else if (update.hasCallbackQuery()) {
             chatId = update.getCallbackQuery().getMessage().getChatId();
             userId = update.getCallbackQuery().getFrom().getId();
@@ -58,7 +59,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    private void sendHelpText(long chatId, String textToSend){
+    private void sendHelpText(long chatId, String textToSend) {
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
         message.setText(textToSend);
@@ -66,20 +67,36 @@ public class TelegramBot extends TelegramLongPollingBot {
         try {
             execute(message);
 //            log.info("Reply sent");
-        } catch (TelegramApiException e){
+        } catch (TelegramApiException e) {
+//            log.error(e.getMessage());
+        }
+    }
+
+    private void sendCurrencyRates(long chatId, String textToSend) {
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
+        message.setText(textToSend);
+
+        try {
+            execute(message);
+//            log.info("Reply sent");
+        } catch (TelegramApiException e) {
 //            log.error(e.getMessage());
         }
     }
 
     private void botAnswerUtils(String receivedMessage, long chatId, String userName) {
-        switch (receivedMessage){
+        switch (receivedMessage) {
             case "/start":
                 startBot(chatId, userName);
                 break;
             case "/help":
                 sendHelpText(chatId, "HELP");
                 break;
-            default: break;
+            case "/rates":
+                sendCurrencyRates(chatId, service.getCurrencyRates());
+            default:
+                break;
         }
     }
 
