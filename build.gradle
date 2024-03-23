@@ -16,6 +16,7 @@ repositories {
 }
 
 dependencies {
+	implementation 'org.telegram:telegrambots:6.9.7.1'
 	implementation 'org.springframework.boot:spring-boot-starter'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'org.json:json:20240303'
